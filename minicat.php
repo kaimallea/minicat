@@ -8,6 +8,8 @@
 require_once(__DIR__ . '/includes/assets.php');
 require_once(__DIR__ . '/lib/Yaml/Yaml.php');
 require_once(__DIR__ . '/lib/Yaml/Parser.php');
+require_once(__DIR__ . '/lib/Yaml/Exception/ExceptionInterface.php');
+require_once(__DIR__ . '/lib/Yaml/Exception/ParseException.php');
 require_once(__DIR__ . '/lib/Yaml/Inline.php');
 require_once(__DIR__ . '/lib/Yaml/Unescaper.php');
 use Symfony\Component\Yaml\Yaml;
