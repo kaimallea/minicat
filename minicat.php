@@ -5,9 +5,12 @@
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
-
-//require_once(__DIR__ . '/lib/sfYaml/sfYaml.php');
 require_once(__DIR__ . '/includes/assets.php');
+require_once(__DIR__ . '/lib/Yaml/Yaml.php');
+require_once(__DIR__ . '/lib/Yaml/Parser.php');
+require_once(__DIR__ . '/lib/Yaml/Inline.php');
+require_once(__DIR__ . '/lib/Yaml/Unescaper.php');
+use Symfony\Component\Yaml\Yaml;
 
 /* Idk the real identity of the person who created this ascii
    art, but it's awesome, so I'm using it. I shall call you...
@@ -88,11 +91,13 @@ class Minicat {
         // path to a config file. It will become an object made up of
         // parsed YAML
         try {
-            self::$config = sfYaml::load(self::$config);
+            self::$config = Yaml::parse(self::$config);
         } catch (Exception $e) {
             self::log($e->getMessage(), true);
             exit(1);
         }
+
+        var_dump(self::$config);
 
         if (self::$conditional_build) {
             self::log('Conditional build mode');

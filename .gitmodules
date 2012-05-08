@@ -1,0 +1,3 @@
+[submodule "lib/Yaml"]
+	path = lib/Yaml
+	url = https://github.com/symfony/Yaml.git
