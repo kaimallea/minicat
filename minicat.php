@@ -40,6 +40,7 @@ use Symfony\Component\Yaml\Yaml;
 */
 class Minicat {
     const DEFAULT_CONFIG_FILENAME = 'minicat.yaml';
+    private static $manifest;
     private static $config;
     private static $verbose;
     private static $conditional_build;
@@ -58,15 +59,15 @@ class Minicat {
                 case 'help':
                     self::print_help();
                     exit(1);
-                case 'c':   // fall through
-                case 'config':
-                    self::$config = $val;
+                case 'm':   // fall through
+                case 'manifest':
+                    self::$manifest = $val;
                     break;
                 case 'v':   // fall through
                 case 'verbose':
                     self::$verbose = true;
                     break;
-                case 'i':   // fall through
+                case 'c':   // fall through
                 case 'conditional':
                     self::$conditional_build = $val;
                 default:
@@ -75,32 +76,85 @@ class Minicat {
             }
         }
 
+/*
         if (self::$verbose) {
-            self::log('Verbose mode');
-            self::print_kitty();
+            //self::print_kitty();
+        }
+*/
+        if (!self::$manifest) { 
+            self::log(sprintf('No manifest specified, trying %s', (self::$manifest = self::get_default_config_path())));
         }
 
-        if (!self::$config) { 
-            self::log(sprintf('No config specified, trying %s', (self::$config = self::get_default_config_path())));
-        }
-
-        if (!file_exists(self::$config)) {
-            self::log(sprintf('Could not open config file %s', self::$config), true);
+        if (!file_exists(self::$manifest)) {
+            self::log(sprintf('Could not open manifest file %s', self::$manifest), true);
             exit(1);
         }
 
-        // self::$config begins its life as a string representing the
-        // path to a config file. It will become an object made up of
-        // parsed YAML
         try {
-            self::$config = Yaml::parse(self::$config);
+            self::$manifest = Yaml::parse(self::$manifest);
         } catch (Exception $e) {
             self::log($e->getMessage(), true);
             exit(1);
         }
 
+        if ( !(self::$manifest['config']) ) {
+            self::log('No config section found in manifest.');
+            exit(1);
+        }
+
+        self::fetch_config();
+    
         if (self::$conditional_build) {
             self::log('Conditional build mode');
+        }
+
+        self::build();
+    }
+
+
+    public static function build () {
+        self::log(sprintf('Identified %s parent assets', count(self::$manifest)));
+    }
+
+
+    public static function fetch_config () {
+        for ($i = 0; $i < count(self::$manifest['config']); ++$i) {
+            foreach(self::$manifest['config'][$i] as $setting => $val) {
+                switch (strtolower($setting)) {
+                    case 'js_compiler_path':
+                        self::$config['js_compiler_path'] = $val;
+                        break;
+                    case 'js_compiler_command':
+                        self::$config['js_compiler_command'] = $val;
+                        break;
+                    case 'css_compiler_path':
+                        self::$config['css_compiler_path'] = $val;
+                        break;
+                    case 'css_compiler_command':
+                        self::$config['css_compiler_command'] = $val;
+                        break;
+                    default:
+                        self::log(sprintf('Unknown config setting "%s" (skipped)', $setting));
+                }
+            }
+        }
+
+        unset(self::$manifest['config']);
+    }
+
+
+    public static function draw_tree () {
+        foreach (self::$manifest as $parent => $assets) {
+            if (strtolower($parent) === 'config') {
+                continue;
+            }
+            self::log('[ '.$parent . ' ]');
+            foreach ($assets as $asset) {
+                self::log('    `--' . $asset['file']);
+                if (isset($asset['minify'])) {
+                    self::log('        `--minify: ' . $asset['minify']);
+                }
+            }
         }
     }
 
@@ -155,8 +209,8 @@ class Minicat {
 if (PHP_SAPI === 'cli') {
     Minicat::init(
         getopt(
-            'c:i:hv',
-            array('config:', 'conditional:', 'help', 'verbose')
+            'm:c:hv',
+            array('manifest:', 'conditional:', 'help', 'verbose')
         )
     );
 }
