@@ -97,8 +97,6 @@ class Minicat {
             exit(1);
         }
 
-        var_dump(self::$config);
-
         if (self::$conditional_build) {
             self::log('Conditional build mode');
         }
