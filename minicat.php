@@ -70,6 +70,7 @@ class Minicat {
                 case 'c':   // fall through
                 case 'conditional':
                     self::$conditional_build = $val;
+                    break;
                 default:
                     self::print_help();
                     exit(1);
@@ -102,22 +103,59 @@ class Minicat {
             exit(1);
         }
 
-        self::fetch_config();
+        self::separate_config();
     
         if (self::$conditional_build) {
+            self::$conditional_build = explode(' ', self::$conditional_build);
             self::log('Conditional build mode');
         }
 
-        self::build();
+        self::map_source_assets();
+        //self::build();
     }
 
 
     public static function build () {
-        self::log(sprintf('Identified %s parent assets', count(self::$manifest)));
+        self::log(sprintf('Identified %s target assets', count(self::$manifest)));
+
+        foreach (self::$manifest as $target_asset => $source_asset_collection) {
+            self::log(sprintf('Building %s...', $target_asset));
+            foreach ($source_asset_collection as $source_asset) {
+                self::log(sprintf('|`-%s', $source_asset['file']));
+                if (isset($source_asset['minify']) &&
+                    strtolower($source_asset['minify']) === 'no') {
+                    self::log('|  `-Skipping minification');
+                }
+            }
+            self::log('Concatenating source assets...');
+            self::log('Build successful' . "\n");
+        }
     }
 
 
-    public static function fetch_config () {
+    // Determine whether or not a source asset is present
+    // in the manifest
+    public static function map_source_assets () {
+        $conditional_build = &self::$conditional_build;
+        $result = array_filter(
+                &self::$manifest,
+                function ($manifest) {
+                    foreach($manifest as $target => $sources) {
+                        foreach($sources as $source) {
+                            if (in_array($source['file'], $conditional_build)) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                }
+            );
+
+        print_r($r);
+    }
+
+
+    public static function separate_config () {
         for ($i = 0; $i < count(self::$manifest['config']); ++$i) {
             foreach(self::$manifest['config'][$i] as $setting => $val) {
                 switch (strtolower($setting)) {
@@ -180,7 +218,9 @@ class Minicat {
     /**
      * Print program help
      */
-    public static function print_help () {}
+    public static function print_help () {
+        echo 'Help coming soon!' . "\n";
+    }
 
 
     // ;)
