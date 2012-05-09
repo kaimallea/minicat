@@ -34,7 +34,7 @@ use Symfony\Component\Yaml\Yaml;
                      `*-*   `*-*  `*-*'        
 
 
-   MINIfy and conCATenate your JavaScript and CSS files
+   Automate your JS/CSS minification and concatenation process
 
 */
 class Minicat {
