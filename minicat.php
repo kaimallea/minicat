@@ -123,10 +123,13 @@ class Minicat {
                 if (!self::conditional_test($target_asset)) {
                     self::log(sprintf('Skipping %s (no matches)', $target_asset));
                     continue;
+                } else {
+                    self::log(sprintf('Conditional match: %s', $target_asset));
                 }
             }
 
             self::log(sprintf('Building %s...', $target_asset));
+
             foreach ($source_asset_collection as $source_asset) {
                 self::log(sprintf('|`-%s', $source_asset['file']));
                 if (isset($source_asset['minify']) &&
