@@ -109,9 +109,8 @@ class Minicat {
             self::$conditional_build = explode(' ', self::$conditional_build);
             self::log('Conditional build mode');
         }
-
-        self::map_source_assets();
-        //self::build();
+        
+        self::build();
     }
 
 
@@ -119,6 +118,14 @@ class Minicat {
         self::log(sprintf('Identified %s target assets', count(self::$manifest)));
 
         foreach (self::$manifest as $target_asset => $source_asset_collection) {
+            
+            if (self::$conditional_build) {
+                if (!self::conditional_test($target_asset)) {
+                    self::log(sprintf('Skipping %s (no matches)', $target_asset));
+                    continue;
+                }
+            }
+
             self::log(sprintf('Building %s...', $target_asset));
             foreach ($source_asset_collection as $source_asset) {
                 self::log(sprintf('|`-%s', $source_asset['file']));
@@ -134,24 +141,18 @@ class Minicat {
 
 
     // Determine whether or not a source asset is present
-    // in the manifest
-    public static function map_source_assets () {
-        $conditional_build = &self::$conditional_build;
-        $result = array_filter(
-                &self::$manifest,
-                function ($manifest) {
-                    foreach($manifest as $target => $sources) {
-                        foreach($sources as $source) {
-                            if (in_array($source['file'], $conditional_build)) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    }
-                }
-            );
+    public static function conditional_test ($target, $filenames_only=false) {
+        foreach (self::$manifest[$target] as $source_asset) {
+            
+            if ($filenames_only) {
 
-        print_r($r);
+            } else {
+                if (in_array($source_asset['file'], self::$conditional_build)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 
