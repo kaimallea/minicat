@@ -5,7 +5,6 @@
  * License: MIT (http://www.opensource.org/licenses/mit-license.php)
  */
 
-require_once(__DIR__ . '/includes/assets.php');
 require_once(__DIR__ . '/lib/Yaml/Yaml.php');
 require_once(__DIR__ . '/lib/Yaml/Parser.php');
 require_once(__DIR__ . '/lib/Yaml/Exception/ExceptionInterface.php');
