@@ -43,6 +43,7 @@ class Minicat {
     private static $config;
     private static $verbose;
     private static $conditional_build;
+    private static $filenames_only;
 
 
     /**
@@ -69,6 +70,10 @@ class Minicat {
                 case 'c':   // fall through
                 case 'conditional':
                     self::$conditional_build = $val;
+                    break;
+                case 'f':   // fall through
+                case 'filename':
+                    self::$filenames_only = true;
                     break;
                 default:
                     self::print_help();
@@ -143,11 +148,15 @@ class Minicat {
 
 
     // Determine whether or not a source asset is present
-    public static function conditional_test ($target, $filenames_only=false) {
+    public static function conditional_test ($target) {
         foreach (self::$manifest[$target] as $source_asset) {
             
-            if ($filenames_only) {
-
+            if (self::$filenames_only) {
+                foreach (self::$conditional_build as $conditional_file) {
+                    if (strpos($conditional_file, basename($source_asset['file'])) !== false) {
+                        return true;
+                    }
+                }
             } else {
                 if (in_array($source_asset['file'], self::$conditional_build)) {
                     return true;
@@ -197,6 +206,12 @@ class Minicat {
                 }
             }
         }
+    }
+
+
+    // Return only the extension portion of a path
+    public static function extension ($str) {
+        return pathinfo($str, PATHINFO_EXTENSION);
     }
 
 
@@ -252,8 +267,8 @@ class Minicat {
 if (PHP_SAPI === 'cli') {
     Minicat::init(
         getopt(
-            'm:c:hv',
-            array('manifest:', 'conditional:', 'help', 'verbose')
+            'm:c:hvf',
+            array('manifest:', 'conditional:', 'help', 'verbose', 'filename')
         )
     );
 }
