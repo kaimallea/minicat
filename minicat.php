@@ -133,15 +133,16 @@ class Minicat {
             }
 
             self::log(sprintf('Building %s...', $target_asset));
-
+            self::log("Step 1: Minify...");
             foreach ($source_asset_collection as $source_asset) {
-                self::log(sprintf('|`-%s', $source_asset['file']));
+                self::log(sprintf('    |`-%s', $source_asset['file']));
                 if (isset($source_asset['minify']) &&
                     strtolower($source_asset['minify']) === 'no') {
-                    self::log('|  `-Skipping minification');
+                    self::log('    |  `-Skipping minification');
                 }
             }
-            self::log('Concatenating source assets...');
+
+            self::log('Step 2: Concatenate...');
             self::log('Build successful' . "\n");
         }
     }
