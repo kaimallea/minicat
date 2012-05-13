@@ -194,22 +194,6 @@ class Minicat {
     }
 
 
-    public static function draw_tree () {
-        foreach (self::$manifest as $parent => $assets) {
-            if (strtolower($parent) === 'config') {
-                continue;
-            }
-            self::log('[ '.$parent . ' ]');
-            foreach ($assets as $asset) {
-                self::log('    `--' . $asset['file']);
-                if (isset($asset['minify'])) {
-                    self::log('        `--minify: ' . $asset['minify']);
-                }
-            }
-        }
-    }
-
-
     // Return only the extension portion of a path
     public static function extension ($str) {
         return pathinfo($str, PATHINFO_EXTENSION);
