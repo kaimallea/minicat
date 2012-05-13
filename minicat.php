@@ -1,8 +1,8 @@
 <?php
 /**
- * Copyright 2012 Kai Mallea (kai@mallea.net)
- *
- * License: MIT (http://www.opensource.org/licenses/mit-license.php)
+ * @copyright 2012 Kai Mallea
+ * @author Kai Mallea <kai@mallea.net>
+ * @license MIT
  */
 
 require_once(__DIR__ . '/lib/Yaml/Yaml.php');
@@ -51,6 +51,10 @@ class Minicat {
      *      a. there is an explicitly defined config or we will look
      *         for the default (./minicat.yaml), and
      *      b. the config exists and can be parsed without issue
+     *
+     * @param array $args Command line arguments from getopt()
+     *
+     * @return void
      */
     public static function init ($args) {
         foreach ($args as $arg => $val) {
@@ -118,6 +122,12 @@ class Minicat {
     }
 
 
+    /**
+     * The main build loop which peforms minification and
+     * concatenation on each asset
+     *
+     * @return void
+     */
     public static function build () {
         self::log(sprintf('Identified %s target assets', count(self::$manifest)));
 
@@ -148,7 +158,15 @@ class Minicat {
     }
 
 
-    // Determine whether or not a source asset is present
+    /**
+     * Check if any of the "conditional" files passed in on
+     * the command line are defined in the manifest for a 
+     * particular target file.
+     *
+     * @param string $target Target file
+     *
+     * @return true|false
+     */
     public static function conditional_test ($target) {
         foreach (self::$manifest[$target] as $source_asset) {
             
@@ -168,6 +186,12 @@ class Minicat {
     }
 
 
+    /**
+     * Remove the "config" section from the config file and store it
+     * in a class variable
+     *
+     * @return void
+     */
     public static function separate_config () {
         for ($i = 0; $i < count(self::$manifest['config']); ++$i) {
             foreach(self::$manifest['config'][$i] as $setting => $val) {
@@ -210,14 +234,25 @@ class Minicat {
     }
 
 
-    // Return only the extension portion of a path
-    public static function extension ($str) {
-        return pathinfo($str, PATHINFO_EXTENSION);
+    /**
+     * Return a file's extension
+     *
+     * @param string $filename File name
+     *
+     * @return string File's extension
+     */
+    public static function extension ($filename) {
+        return pathinfo($filename, PATHINFO_EXTENSION);
     }
 
 
     /**
-     * Log a message to stdout
+     * Log a message to stdout in verbose mode
+     *
+     * @param string $msg Message to log
+     * @param boolean $force Force output even when not in verbose mode
+     *
+     * @return string File's extension
      */
     public static function log ($msg, $force=false) {
         if (self::$verbose || $force) {
@@ -228,6 +263,8 @@ class Minicat {
 
     /**
      * Return path to minicat.yaml in current working dir
+     *
+     * @return string Current working directory + '/minicat.yaml'
      */
     public static function get_default_config_path () {
         return getcwd() . DIRECTORY_SEPARATOR . self::DEFAULT_CONFIG_FILENAME;
@@ -236,13 +273,19 @@ class Minicat {
 
     /**
      * Print program help
+     *
+     * @return void
      */
     public static function print_help () {
         echo 'Help coming soon!' . "\n";
     }
 
 
-    // ;)
+    /**
+     * Print kitten ascii art
+     *
+     * @return void
+     */
     public static function print_kitty () {
         echo "
                       _                        
