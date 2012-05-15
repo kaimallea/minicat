@@ -231,6 +231,69 @@ class Minicat {
 
 
     /**
+     * Concatenate an array of files using native OS commands
+     *
+     * @param array $source_files Files to concatenate
+     * @param string $target_file File to output
+     *
+     * @return void
+     */
+    public static function concat ($source_files, $target_file) {
+        if (strtolower(substr(PHP_OS, 0, 3)) === 'win') {
+            $cmd = sprintf('copy /b /y %s %s', implode('+', $source_files), $target_file);
+        } else {
+            $cmd = sprintf('cat %s > %s', implode(' ', $source_files), $target_file);
+        }
+
+        exec($cmd, $output, $result);
+
+        if ($result) {
+            self::log(
+                sprintf('There was an error concatenating %s',
+                    implode(',', $source_files),
+                    true)
+            );
+
+            exit(1);
+        }
+    }
+
+
+    /**
+     * Minify a file and output a temporary file
+     *
+     * @param string $source_file File to minify
+     *
+     * @return string Path to minified temp file
+     */
+    public static function minify ($source_file) {
+        $temp_dir = sys_get_temp_dir();
+        $temp_file = tempnam($tempdir, $source_file);
+
+        if (!$temp_file) {
+            self::log('Could not create temp file in ' . $temp_dir, true);
+            exit(1);                    
+        }
+
+        $ext = self::extension($source_file);
+        $minify_cmd = str_replace(
+            array('{$compiler_path}', '{$input_file}', '{$output_file}'),
+            array(self::$config[$ext.'_compiler_path'], $source_file, $temp_file),
+            self::$config[$ext.'_compiler_command']
+        );
+
+        exec($minify_cmd, $output, $result);
+        
+        if ($result) {
+            self::log('There was a problem minifying ' . $source_file, true);
+            exit(1);
+        }
+
+        return $temp_file;
+    }
+
+
+    /**
      * Log a message to stdout in verbose mode
      *
      * @param string $msg Message to log
