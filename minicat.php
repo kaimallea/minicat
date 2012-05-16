@@ -144,15 +144,21 @@ class Minicat {
 
             self::log(sprintf('Building %s...', $target_asset));
             self::log("Step 1: Minify...");
+
             foreach ($source_asset_collection as $source_asset) {
                 self::log(sprintf('    |`-%s', $source_asset['file']));
                 if (isset($source_asset['minify']) &&
                     strtolower($source_asset['minify']) === 'no') {
                     self::log('    |  `-Skipping minification');
+                } else {
+                    $temp_files[] = self::minify($source_asset['file']);
                 }
             }
 
             self::log('Step 2: Concatenate...');
+
+            self::concat($temp_files, $target_asset);
+
             self::log('Build successful' . "\n");
         }
     }
@@ -268,7 +274,7 @@ class Minicat {
      */
     public static function minify ($source_file) {
         $temp_dir = sys_get_temp_dir();
-        $temp_file = tempnam($tempdir, $source_file);
+        $temp_file = tempnam($temp_dir, $source_file);
 
         if (!$temp_file) {
             self::log('Could not create temp file in ' . $temp_dir, true);
