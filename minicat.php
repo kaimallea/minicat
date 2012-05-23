@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 /**
  * @copyright 2012 Kai Mallea
