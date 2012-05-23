@@ -85,11 +85,7 @@ class Minicat {
             }
         }
 
-/*
-        if (self::$verbose) {
-            //self::print_kitty();
-        }
-*/
+
         if (!self::$manifest) { 
             self::log(sprintf('No manifest specified, trying %s', (self::$manifest = self::get_default_config_path())));
         }
@@ -331,32 +327,6 @@ class Minicat {
      */
     public static function print_help () {
         echo 'Help coming soon!' . "\n";
-    }
-
-
-    /**
-     * Print kitten ascii art
-     *
-     * @return void
-     */
-    public static function print_kitty () {
-        echo "
-                      _                        
-                      \`*-.                    
-                       )  _`-.                 
-                      .  : `. .                
-                      : _   '  \               
-                      ; *` _.   `*-._          
-                      `-.-'          `-.       
-                        ;       `       `.     
-                        :.       .        \    
-                        . \  .   :   .-'   .   
-                        '  `+.;  ;  '      :   
-                        :  '  |    ;       ;-. 
-                        ; '   : :`-:     _.`* ;
-               [bug] .*' /  .*' ; .*`- +'  `*' 
-                     `*-*   `*-*  `*-*'        
-        \n";
     }
 }
 
